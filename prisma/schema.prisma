@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int       @id @default(autoincrement())
+  email    String    @unique
+  name     String
+  password String
+  profile  Profile?
+  rooms    Room[]
+  messages Message[]
+  Member   Member[]
+  contacts String?
+}
+
+model Profile {
+  id     Int     @id @default(autoincrement())
+  userId Int     @unique
+  bio    String?
+  User   User    @relation(fields: [userId], references: [id])
+}
+
+model Room {
+  id          Int       @id @default(autoincrement())
+  title       String    @unique
+  description String?
+  members     Member[]
+  messages    Message[]
+  User        User?     @relation(fields: [userId], references: [id])
+  userId      Int?
+}
+
+model Member {
+  id     Int    @id @default(autoincrement())
+  userId Int
+  roomId Int
+  user   User   @relation(fields: [userId], references: [id])
+  room   Room   @relation(fields: [roomId], references: [id])
+  role   String @default("PARTICIPANT")
+}
+
+model Message {
+  id     Int    @id @default(autoincrement())
+  text   String
+  userId Int
+  user   User   @relation(fields: [userId], references: [id])
+  roomId Int
+  room   Room   @relation(fields: [roomId], references: [id])
+}
